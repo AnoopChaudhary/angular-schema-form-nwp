@@ -381,12 +381,18 @@ angular.module('schemaForm').provider('schemaForm',
           });
         }
 
+        if (obj.accordionGroups) {
+          angular.forEach(obj.accordionGroups, function(accordionGroup) {
+            accordionGroup.items = service.merge(schema, accordionGroup.items, ignore, options, obj.readonly);
+          });
+        }
+
         // Special case: checkbox
         // Since have to ternary state we need a default
         if (obj.type === 'checkbox' && angular.isUndefined(obj.schema['default'])) {
           obj.schema['default'] = false;
         }
-        
+
         // Special case: template type with tempplateUrl that's needs to be loaded before rendering
         // TODO: this is not a clean solution. Maybe something cleaner can be made when $ref support
         // is introduced since we need to go async then anyway
@@ -467,6 +473,14 @@ angular.module('schemaForm').provider('schemaForm',
       if (form.tabs) {
         angular.forEach(form.tabs, function(tab) {
           angular.forEach(tab.items, function(f) {
+            service.traverseForm(f, fn);
+          });
+        });
+      }
+
+      if (form.accordionGroups) {
+        angular.forEach(form.accordionGroups, function(accordionGroup) {
+          angular.forEach(accordionGroup.items, function(f) {
             service.traverseForm(f, fn);
           });
         });
